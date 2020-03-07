@@ -1,0 +1,91 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --nav-height: 50px;
+    --background-light: #dddddd;
+    --background-muted: #bbbbbb;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    display: grid;
+    grid-template-rows: var(--nav-height) 1fr;
+
+    height: 100vh;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+
+    padding: 10px;
+    background: var(--background-muted);
+}
+
+#emulator {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+}
+
+#rom, #ram, #info {
+    margin: 1em;
+    border: 2px solid #000000;
+    height: calc(100% - 2em);
+    max-height: calc(100% - 2em);
+}
+
+table thead {
+    background: var(--background-muted)
+}
+
+table tr:nth-of-type(even) {
+    background: var(--background-light)
+}
+
+#screen {
+    width: 512px;
+    height: 256px;
+    border: 1px solid #0000ff;
+    margin: 1em;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#rom, #ram {
+    display: grid;
+    grid-template-rows: 24px 1fr;
+}
+
+#rom .clusterize-scroll, #ram .clusterize-scroll {
+    height: calc(100vh - var(--nav-height) - 2em - 24px);
+    max-height: calc(100vh - var(--nav-height) - 2em - 24px);
+}
+
+#rom .row, #ram .row {
+    border-bottom: 1px solid #000000;
+    padding: 2px;
+    height: 24px;
+}
+
+#rom .row strong, #ram .row strong {
+    display: inline-block;
+    width: 70px;
+}
+
+button, input {
+    margin: 0 1em;
+}
+
+.row.hl {
+    background: #ffff7a;
+}

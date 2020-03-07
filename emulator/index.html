@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Emulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.css" integrity="sha256-kJfPtGy9bUIpQZuossvZA3rOoNdqy3HnPIQXX7K2x9A=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <nav>
+            <input type="file" id="load-hack" accept=".hack">
+            <button id="action-step">Step</button>
+            <button id="action-step-x">Step X</button>
+            <input type="number" value="10000" step="1" id="input-step-x">
+            <button id="action-reset">Reset</button>
+        </nav>
+        <section id="emulator">
+            <div id="rom">
+                <div class="row">
+                    <strong>Address</strong>
+                    <span>Instruction</span>
+                </div>
+                <div class="clusterize-scroll">
+                    <div class="clusterize-content">
+                        <div class="clusterize-no-data">Loading data…</div>
+                    </div>
+                </div>
+            </div>
+            <div id="ram">
+                <div class="row">
+                    <strong>Address</strong>
+                    <span>Content</span>
+                </div>
+                <div class="clusterize-scroll">
+                    <div class="clusterize-content">
+                        <div class="clusterize-no-data">Loading data…</div>
+                    </div>
+                </div>
+            </div>
+            <div id="info">
+                <canvas id="screen" width="512" height="256">
+                    Your browser doesn't support canvas elements.
+                    The screen will not be displayed.
+                </canvas>
+
+                <table id="registers">
+                    <thead>
+                        <tr>
+                            <th>Register</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>D</td>
+                            <td id="d-value">0</td>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td id="a-value">0</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td id="m-value">0</td>
+                        </tr>
+                        <tr>
+                            <td>PC</td>
+                            <td id="pc-value">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js" integrity="sha256-j2fSUXSx7aab6LM9Rhktwi08KATeQeYqfrLrUS3c56Y=" crossorigin="anonymous"></script>
+    <script src="bundle.js"></script>
+</body>
+</html>
