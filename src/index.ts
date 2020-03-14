@@ -4,6 +4,8 @@ import { Machine } from "./machine"
 const $ = (sel: string) => document.querySelector(sel) as HTMLElement
 
 const SCREEN = 16384
+const PAUSE = '❙❙'
+const PLAY = '▶'
 
 // Needed because 0xffff = -1, not 65k. We are dealing with signed 16 bit ints here
 function toDecimal(num: number) {
@@ -15,19 +17,53 @@ function toDecimal(num: number) {
 }
 
 const fileUpload = $('#load-hack') as HTMLInputElement
-const actionStep = $('#action-step')
-const actionStepX = $('#action-step-x')
+const actionStep = $('#action-step') as HTMLButtonElement
+const actionStepX = $('#action-step-x') as HTMLButtonElement
 const inputStepX = $('#input-step-x') as HTMLInputElement
 const dValue = $('#d-value')
 const aValue = $('#a-value')
 const mValue = $('#m-value')
 const pcValue = $('#pc-value')
+const inputStepRate = $('#input-step-rate') as HTMLInputElement
+const playingLabel = $('#playing-label')
+playingLabel.textContent = PLAY
+
 const canvas = $('canvas') as HTMLCanvasElement
 const context = canvas.getContext('2d')
 
 $('#action-reset').addEventListener('click', () => {
+    cancelRun()
     load(window.fileText)
 })
+
+let runTimer: undefined | number | NodeJS.Timeout
+$('#action-step-rate').addEventListener('click', () => {
+    if (runTimer) {
+        cancelRun()
+    } else {
+        startRun()
+    }
+})
+
+function cancelRun() {
+    clearInterval(runTimer as number)
+    runTimer = undefined
+
+    inputStepRate.disabled = actionStep.disabled = actionStepX.disabled = inputStepX.disabled = false
+    playingLabel.textContent = PLAY
+
+}
+
+function startRun() {
+    inputStepRate.disabled = actionStep.disabled = actionStepX.disabled = inputStepX.disabled = true
+    playingLabel.textContent = PAUSE
+
+    const interval = +inputStepRate.value / 1000
+    runTimer = setTimeout(function run() {
+        step(1)
+        runTimer = setTimeout(run, interval)
+    }, interval)
+}
 
 actionStep.addEventListener('click', () => step(1))
 actionStepX.addEventListener('click', () => step(+inputStepX.value))
@@ -68,6 +104,7 @@ function load(text: string | undefined) {
 }
 
 function setupEmulator(instructions: Instruction[]) {
+    cancelRun()
     window.machine = new Machine(instructions)
     step(0)
     if (context) {

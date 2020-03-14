@@ -82,10 +82,15 @@ table tr:nth-of-type(even) {
     width: 70px;
 }
 
-button, input {
+button, input, .action-group {
     margin: 0 1em;
 }
 
 .row.hl {
     background: #ffff7a;
+}
+
+.action-group {
+    border: 1px solid #000000;
+    padding: .2em;
 }
