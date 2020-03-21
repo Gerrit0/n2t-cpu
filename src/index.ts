@@ -50,7 +50,7 @@ $('#action-step-rate').addEventListener('click', () => {
 }, { passive: true })
 
 function cancelRun() {
-    clearInterval(runTimer as number)
+    clearTimeout(runTimer as number)
     runTimer = undefined
 
     inputStepRate.disabled = actionStep.disabled = actionStepX.disabled = inputStepX.disabled = false
@@ -148,6 +148,14 @@ function step(n: number) {
         alert(err.message)
     }
 
+    function ensureVisible(el: HTMLElement, pos: number) {
+        if (el.scrollTop + el.clientHeight < pos) {
+            el.scrollTop = pos - Math.floor(el.clientHeight * 2/3)
+        } else if (pos < el.scrollTop) {
+            el.scrollTop = pos - Math.floor(el.clientHeight * 1/3)
+        }
+    }
+
     updateReg()
     clusterRom.update(m.rom.map((inst, i) => {
         if (i === m.cpu.pc) {
@@ -155,7 +163,7 @@ function step(n: number) {
         }
         return `<div class="row"><strong>${i}</strong><span>${inst.emit()}</span></div>`
     }))
-    $('#rom .clusterize-scroll').scrollTop = Math.max(0, 24 * (m.cpu.pc - 5));
+    ensureVisible($('#rom .clusterize-scroll'), 24 * m.cpu.pc);
 
     clusterRam.update(m.ram.map((ram, i) => {
         if (i === m.cpu.a) {
@@ -163,7 +171,7 @@ function step(n: number) {
         }
         return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
     }))
-    $('#ram .clusterize-scroll').scrollTop = Math.max(0, 24 * (m.cpu.a - 5));
+    ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a)
 }
 
 
