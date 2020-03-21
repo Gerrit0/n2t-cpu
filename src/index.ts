@@ -1,6 +1,8 @@
 import { parse, Instruction } from "./instruction"
 import { Machine } from "./machine"
 
+console.log('Inspect the window.machine global after loading a hack file.')
+
 const $ = (sel: string) => document.querySelector(sel) as HTMLElement
 
 const SCREEN = 16384
@@ -9,11 +11,13 @@ const PLAY = '▶'
 
 // Needed because 0xffff = -1, not 65k. We are dealing with signed 16 bit ints here
 function toDecimal(num: number) {
+    let sign = ''
     if (num & 0x8000) {
         // negative
         num = ((~num) & 0x7FFF) + 1
+        sign = '-'
     }
-    return num.toString()
+    return sign + num.toString()
 }
 
 const fileUpload = $('#load-hack') as HTMLInputElement
@@ -34,7 +38,7 @@ const context = canvas.getContext('2d')
 $('#action-reset').addEventListener('click', () => {
     cancelRun()
     load(window.fileText)
-})
+}, { passive: true })
 
 let runTimer: undefined | number | NodeJS.Timeout
 $('#action-step-rate').addEventListener('click', () => {
@@ -43,7 +47,7 @@ $('#action-step-rate').addEventListener('click', () => {
     } else {
         startRun()
     }
-})
+}, { passive: true })
 
 function cancelRun() {
     clearInterval(runTimer as number)
@@ -65,8 +69,8 @@ function startRun() {
     }, interval)
 }
 
-actionStep.addEventListener('click', () => step(1))
-actionStepX.addEventListener('click', () => step(+inputStepX.value))
+actionStep.addEventListener('click', () => step(1), { passive: true })
+actionStepX.addEventListener('click', () => step(+inputStepX.value), { passive: true })
 
 const clusterRom = new Clusterize({
     rows: [],
@@ -83,14 +87,14 @@ fileUpload.addEventListener('change', () => {
     if (fileUpload.files && fileUpload.files[0]) {
         loadFile(fileUpload.files[0])
     }
-})
+}, { passive: true })
 
 function loadFile(file: File) {
     const reader = new FileReader()
     reader.addEventListener('load', () => {
         window.fileText = reader.result as string
         load(window.fileText)
-    })
+    }, { passive: true })
     reader.readAsText(file)
 }
 
