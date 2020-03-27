@@ -180,9 +180,9 @@ function step(n: number) {
 
     clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {
         if (i + 256 === m.ram[0]) {
-            return `<div class="row hl"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+            return `<div class="row hl"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
         }
-        return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+        return `<div class="row"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
     }))
     ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256))
 }
