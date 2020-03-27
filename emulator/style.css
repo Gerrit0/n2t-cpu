@@ -30,7 +30,8 @@ nav {
 
 #emulator {
     display: grid;
-    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-columns: 1fr 1fr 3fr;
+    overflow: hidden; /* TODO: This is a hack. Make it go away. */
 }
 
 #rom, #ram, #info {
@@ -61,7 +62,18 @@ table tr:nth-of-type(even) {
     align-items: center;
 }
 
-#rom, #ram {
+:root {
+    --quick-info-height: calc(100vh - var(--nav-height) - 256px - 6em);
+}
+
+#quick-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
+    height: 100%;
+}
+
+#rom, #ram, #stack {
     display: grid;
     grid-template-rows: 24px 1fr;
 }
@@ -70,14 +82,18 @@ table tr:nth-of-type(even) {
     height: calc(100vh - var(--nav-height) - 2em - 24px);
     max-height: calc(100vh - var(--nav-height) - 2em - 24px);
 }
+#stack .clusterize-scroll {
+    height: calc(var(--quick-info-height) - 24px);
+    max-height: calc(var(--quick-info-height) - 24px);
+}
 
-#rom .row, #ram .row {
+#rom .row, #ram .row, #stack .row {
     border-bottom: 1px solid #000000;
     padding: 2px;
     height: 24px;
 }
 
-#rom .row strong, #ram .row strong {
+#rom .row strong, #ram .row strong, #stack .row strong {
     display: inline-block;
     width: 70px;
 }

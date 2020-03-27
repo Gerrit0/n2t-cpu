@@ -40,7 +40,7 @@ $('#action-reset').addEventListener('click', () => {
     load(window.fileText)
 }, { passive: true })
 
-let runTimer: undefined | number | NodeJS.Timeout
+let runTimer: undefined | number
 $('#action-step-rate').addEventListener('click', () => {
     if (runTimer) {
         cancelRun()
@@ -65,8 +65,8 @@ function startRun() {
     const interval = +inputStepRate.value / 1000
     runTimer = setTimeout(function run() {
         step(1)
-        runTimer = setTimeout(run, interval)
-    }, interval)
+        runTimer = setTimeout(run, interval) as unknown as number
+    }, interval) as unknown as number
 }
 
 actionStep.addEventListener('click', () => step(1), { passive: true })
@@ -81,6 +81,11 @@ const clusterRam = new Clusterize({
     rows: [],
     scrollElem: $('#ram .clusterize-scroll'),
     contentElem: $('#ram .clusterize-content')
+})
+const clusterStack = new Clusterize({
+    rows: [],
+    scrollElem: $('#stack .clusterize-scroll'),
+    contentElem: $('#stack .clusterize-content'),
 })
 
 fileUpload.addEventListener('change', () => {
@@ -172,6 +177,14 @@ function step(n: number) {
         return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
     }))
     ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a)
+
+    clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {
+        if (i + 256 === m.ram[0]) {
+            return `<div class="row hl"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+        }
+        return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+    }))
+    ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256))
 }
 
 
