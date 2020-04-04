@@ -95,7 +95,7 @@ table tr:nth-of-type(even) {
 
 #rom .row strong, #ram .row strong, #stack .row strong {
     display: inline-block;
-    width: 70px;
+    width: 150px;
 }
 
 button, input, .action-group {

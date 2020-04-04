@@ -168,11 +168,34 @@ function refreshGui(m: Machine) {
     }))
     ensureVisible(clusterRom.scroll_elem, 24 * m.cpu.pc);
 
+    const ramNameMap: Record<number, string | undefined>  = {
+        0: 'SP',
+        1: 'LCL',
+        2: 'ARG',
+        3: 'THIS',
+        4: 'THAT',
+        5: 'Temp 0',
+        6: 'Temp 1',
+        7: 'Temp 2',
+        8: 'Temp 3',
+        9: 'Temp 4',
+        10: 'Temp 5',
+        11: 'Temp 6',
+        12: 'Temp 7',
+        13: 'R13',
+        14: 'R14',
+        15: 'R15',
+        16384: 'SCREEN',
+        24576: 'KBD'
+    }
+
+    const getName = (i: number) => ramNameMap[i] ? `${i} | ${ramNameMap[i]}` : `${i}`
+
     clusterRam.update(m.ram.map((ram, i) => {
         if (i === m.cpu.a) {
-            return `<div class="row hl"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+            return `<div class="row hl"><strong>${getName(i)}</strong><span>${toDecimal(ram)}</span></div>`
         }
-        return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+        return `<div class="row"><strong>${getName(i)}</strong><span>${toDecimal(ram)}</span></div>`
     }))
     ensureVisible(clusterRam.scroll_elem, 24 * m.cpu.a)
 
