@@ -1,5 +1,6 @@
 import { parse, Instruction } from "./instruction"
 import { Machine } from "./machine"
+import { ensureVisible } from "./gui"
 
 console.log('Inspect the window.machine global after loading a hack file.')
 
@@ -70,17 +71,48 @@ function startRun() {
 }
 
 actionStep.addEventListener('click', () => step(1), { passive: true })
+Mousetrap.bind('s', event => {
+    event.preventDefault()
+    if (!runTimer) {
+        step(1)
+    }
+})
 actionStepX.addEventListener('click', () => step(+inputStepX.value), { passive: true })
+Mousetrap.bind('x', event => {
+    event.preventDefault()
+    if (!runTimer) {
+        step(+inputStepX.value)
+    }
+})
+Mousetrap.bind('shift+x', event => {
+    event.preventDefault()
+    if (!runTimer && window.machine) {
+        const steps = +(prompt("How many steps?", inputStepX.value) || '')
+        if (!Number.isNaN(steps) && steps > 0) {
+            step(steps)
+        }
+    }
+})
 
 const clusterRom = new Clusterize({
     rows: [],
     scrollElem: $('#rom .clusterize-scroll'),
     contentElem: $('#rom .clusterize-content')
 })
+Mousetrap.bind('mod+g', event => {
+    event.preventDefault()
+    const address = +(prompt("Which ROM address?") || '')
+    ensureVisible(clusterRom.scroll_elem, address * 24)
+})
 const clusterRam = new Clusterize({
     rows: [],
     scrollElem: $('#ram .clusterize-scroll'),
     contentElem: $('#ram .clusterize-content')
+})
+Mousetrap.bind('mod+h', event => {
+    event.preventDefault()
+    const address = +(prompt("Which RAM address?") || '')
+    ensureVisible(clusterRam.scroll_elem, address * 24)
 })
 const clusterStack = new Clusterize({
     rows: [],
@@ -93,6 +125,10 @@ fileUpload.addEventListener('change', () => {
         loadFile(fileUpload.files[0])
     }
 }, { passive: true })
+Mousetrap.bind('mod+o', event => {
+    event.preventDefault()
+    fileUpload.click()
+})
 
 function loadFile(file: File) {
     const reader = new FileReader()
@@ -130,7 +166,7 @@ function refreshGui(m: Machine) {
         }
         return `<div class="row"><strong>${i}</strong><span>${inst.emit()}</span></div>`
     }))
-    ensureVisible($('#rom .clusterize-scroll'), 24 * m.cpu.pc);
+    ensureVisible(clusterRom.scroll_elem, 24 * m.cpu.pc);
 
     clusterRam.update(m.ram.map((ram, i) => {
         if (i === m.cpu.a) {
@@ -138,7 +174,7 @@ function refreshGui(m: Machine) {
         }
         return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
     }))
-    ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a)
+    ensureVisible(clusterRam.scroll_elem, 24 * m.cpu.a)
 
     clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {
         if (i + 256 === m.ram[0]) {
@@ -146,18 +182,7 @@ function refreshGui(m: Machine) {
         }
         return `<div class="row"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
     }))
-    ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256))
-
-    function ensureVisible(el: HTMLElement, pos: number) {
-        if (pos < 0 || pos > el.scrollHeight + el.clientHeight) {
-            return
-        }
-        if (el.scrollTop + el.clientHeight < pos) {
-            el.scrollTop = pos - Math.floor(el.clientHeight * 2/3)
-        } else if (pos < el.scrollTop) {
-            el.scrollTop = pos - Math.floor(el.clientHeight * 1/3)
-        }
-    }
+    ensureVisible(clusterStack.scroll_elem, 24 * (m.ram[0] - 256))
 }
 
 function updateReg() {

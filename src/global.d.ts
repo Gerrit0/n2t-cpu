@@ -7,9 +7,15 @@ declare class Clusterize {
     })
 
     update(list: string[]): void
+    scroll_elem: HTMLElement
+    content_elem: HTMLElement
 }
 
 interface Window {
     machine?: import('./machine').Machine
     fileText?: string
+}
+
+declare namespace Mousetrap {
+    export function bind(event: string, callback: (event: Event) => void): void;
 }
