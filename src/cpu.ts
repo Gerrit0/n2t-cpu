@@ -23,7 +23,7 @@ export class CPU {
     }
 
     set pc(value) {
-        assert(value < 0x7fff, 'PC out of bounds, tried to set ' + value)
+        assert(value <= 0x7fff, 'PC out of bounds, tried to set ' + value)
         this._pc = value
     }
 }
