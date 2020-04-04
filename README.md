@@ -10,6 +10,7 @@ Supports drawing to the screen, but not keyboard input.
 
 - Support for all instructions, not just the author's 18 default mnemonics.
 - Keyboard shortcuts (replace CTRL with Command on Mac)
+
     | Shortcut | Behavior |
     | --- | --- |
     | `s` | Step 1 |
