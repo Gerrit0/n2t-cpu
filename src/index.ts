@@ -36,6 +36,8 @@ playingLabel.textContent = PLAY
 const canvas = $('canvas') as HTMLCanvasElement
 const context = canvas.getContext('2d')
 
+const breakpoints = new Set<number>()
+
 $('#action-reset').addEventListener('click', () => {
     cancelRun()
     load(window.fileText)
@@ -104,6 +106,46 @@ Mousetrap.bind('mod+g', event => {
     const address = +(prompt("Which ROM address?") || '')
     ensureVisible(clusterRom.scroll_elem, address * 24)
 })
+clusterRom.content_elem.addEventListener('input', event => {
+    const checkbox = event.target as HTMLInputElement
+    const row = checkbox.parentElement
+    if (!row) return
+    const pc = row.dataset.pc
+    if (!pc) return
+    if (checkbox.checked) {
+        breakpoints.add(+pc)
+        row.classList.add('bp')
+    } else {
+        breakpoints.delete(+pc)
+        row.classList.remove('bp')
+    }
+})
+Mousetrap.bind('mod+b', event => {
+    event.preventDefault()
+    if (window.machine) {
+        breakpoints.add(window.machine.cpu.pc);
+        const row = clusterRom.content_elem.querySelector(`[data-pc="${window.machine.cpu.pc}"]`)
+        if (row instanceof HTMLElement) {
+            row.classList.add('bp')
+            row.querySelector('input')!.checked = true
+        }
+    }
+})
+Mousetrap.bind('mod+shift+b', event => {
+    event.preventDefault()
+    if (window.machine) {
+        const where = +(prompt('Where in ROM should be breakpoint be set?', window.machine.cpu.pc.toString()) || '');
+        if (!Number.isNaN(where)) {
+            breakpoints.add(where);
+            const row = clusterRom.content_elem.querySelector(`[data-pc="${where}"]`)
+            if (row instanceof HTMLElement) {
+                row.classList.add('bp')
+                row.querySelector('input')!.checked = true
+            }
+        }
+    }
+})
+
 const clusterRam = new Clusterize({
     rows: [],
     scrollElem: $('#ram .clusterize-scroll'),
@@ -161,10 +203,18 @@ function setupEmulator(instructions: Instruction[]) {
 function refreshGui(m: Machine) {
     updateReg()
     clusterRom.update(m.rom.map((inst, i) => {
+        let html = `<div data-pc="${i}" class="row`
         if (i === m.cpu.pc) {
-            return `<div class="row hl"><strong>${i}</strong><span>${inst.emit()}</span></div>`
+            html += ' hl'
         }
-        return `<div class="row"><strong>${i}</strong><span>${inst.emit()}</span></div>`
+        if (breakpoints.has(i)) {
+            html += ' bp'
+        }
+        html += '"><input type="checkbox"'
+        if (breakpoints.has(i)) {
+            html += ' checked'
+        }
+        return `${html}><strong>${i}</strong><span>${inst.emit()}</span></div>`
     }))
     ensureVisible(clusterRom.scroll_elem, 24 * m.cpu.pc);
 
@@ -233,6 +283,9 @@ function step(n: number) {
                     context.fillStyle = mem & (1 << i) ? 'black' : 'white'
                     context.fillRect(xStart + i, y, 1, 1)
                 }
+            }
+            if (breakpoints.has(m.cpu.pc)) {
+                break
             }
         }
     } catch (err) {

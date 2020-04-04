@@ -7,6 +7,7 @@ declare class Clusterize {
     })
 
     update(list: string[]): void
+    refresh(): void
     scroll_elem: HTMLElement
     content_elem: HTMLElement
 }

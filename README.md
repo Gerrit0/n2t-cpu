@@ -17,3 +17,5 @@ Supports drawing to the screen, but not keyboard input.
     | `shift+x` | Step X (prompt for X) |
     | `ctrl+g` | Go to ROM address |
     | `ctrl+h` | Go to RAM address |
+    | `ctrl+b` | Set a breakpoint at the current PC |
+    | `ctrl+shift+b` | Set a breakpoint at the prompted address |
