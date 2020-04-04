@@ -122,6 +122,44 @@ function setupEmulator(instructions: Instruction[]) {
     }
 }
 
+function refreshGui(m: Machine) {
+    updateReg()
+    clusterRom.update(m.rom.map((inst, i) => {
+        if (i === m.cpu.pc) {
+            return `<div class="row hl"><strong>${i}</strong><span>${inst.emit()}</span></div>`
+        }
+        return `<div class="row"><strong>${i}</strong><span>${inst.emit()}</span></div>`
+    }))
+    ensureVisible($('#rom .clusterize-scroll'), 24 * m.cpu.pc);
+
+    clusterRam.update(m.ram.map((ram, i) => {
+        if (i === m.cpu.a) {
+            return `<div class="row hl"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+        }
+        return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
+    }))
+    ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a)
+
+    clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {
+        if (i + 256 === m.ram[0]) {
+            return `<div class="row hl"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
+        }
+        return `<div class="row"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
+    }))
+    ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256))
+
+    function ensureVisible(el: HTMLElement, pos: number) {
+        if (pos < 0 || pos > el.scrollHeight + el.clientHeight) {
+            return
+        }
+        if (el.scrollTop + el.clientHeight < pos) {
+            el.scrollTop = pos - Math.floor(el.clientHeight * 2/3)
+        } else if (pos < el.scrollTop) {
+            el.scrollTop = pos - Math.floor(el.clientHeight * 1/3)
+        }
+    }
+}
+
 function updateReg() {
     const machine = window.machine
     if (!machine) return
@@ -151,40 +189,7 @@ function step(n: number) {
         }
     } catch (err) {
         alert(err.message)
+    } finally {
+        refreshGui(m)
     }
-
-    function ensureVisible(el: HTMLElement, pos: number) {
-        if (el.scrollTop + el.clientHeight < pos) {
-            el.scrollTop = pos - Math.floor(el.clientHeight * 2/3)
-        } else if (pos < el.scrollTop) {
-            el.scrollTop = pos - Math.floor(el.clientHeight * 1/3)
-        }
-    }
-
-    updateReg()
-    clusterRom.update(m.rom.map((inst, i) => {
-        if (i === m.cpu.pc) {
-            return `<div class="row hl"><strong>${i}</strong><span>${inst.emit()}</span></div>`
-        }
-        return `<div class="row"><strong>${i}</strong><span>${inst.emit()}</span></div>`
-    }))
-    ensureVisible($('#rom .clusterize-scroll'), 24 * m.cpu.pc);
-
-    clusterRam.update(m.ram.map((ram, i) => {
-        if (i === m.cpu.a) {
-            return `<div class="row hl"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
-        }
-        return `<div class="row"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`
-    }))
-    ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a)
-
-    clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {
-        if (i + 256 === m.ram[0]) {
-            return `<div class="row hl"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
-        }
-        return `<div class="row"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`
-    }))
-    ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256))
 }
-
-
