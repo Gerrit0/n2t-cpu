@@ -1,1 +1,149 @@
-!function(t){var e={};function n(s){if(e[s])return e[s].exports;var r=e[s]={i:s,l:!1,exports:{}};return t[s].call(r.exports,r,r.exports,n),r.l=!0,r.exports}n.m=t,n.c=e,n.d=function(t,e,s){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:s})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var s=Object.create(null);if(n.r(s),Object.defineProperty(s,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var r in t)n.d(s,r,function(e){return t[e]}.bind(null,r));return s},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="",n(n.s=0)}([function(t,e,n){"use strict";function s(t,e="Failed assert"){if(!t)throw new Error(e)}n.r(e);const r=["","M=","D=","MD=","A=","AM=","AD=","AMD="],i=["",";JGT",";JEQ",";JGE",";JLT",";JNE",";JLE",";JMP"],o=Symbol(),c=["D&A","!(D&A)","D+A",o,"D&!A","!(D&!A)",o,"A-D",o,o,o,o,"D","!D","D-1","~D","!D&A","D|!A",o,"D-A","!D&!A","D|A",o,o,o,o,o,o,o,o,o,"D+1",o,o,o,o,o,o,o,o,o,o,"0",o,o,o,o,o,"A","!A","A-1","~A",o,o,o,"A+1",o,o,"-1",o,o,o,o,"1","D&M","!(D&M)","D+M",o,"D&!M","!D|M",o,"M-D",o,o,o,o,o,o,o,o,"!D&M","D|!M",o,"D-M","!D&!M","D|M",o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,"M","!M","M-1","~M",o,o,o,"M+1",o,o,o,o,o,o,o,o].map((t,e)=>t===o?`X${e.toString(16).toUpperCase()}`:t);function a(t){if(s(/^[01]{16}$/.test(t),`Instruction '${t}' does not match format.`),"0"===t[0])return e=parseInt(t,2),{type:"a",eval:t=>{t.a=e,t.pc++},emit:()=>`@${e}`};var e;return function(t,e,n){return{type:"c",eval:s=>{let r=s.d,i=64&t?s.m:s.a;32&t&&(r=0),16&t&&(r=65535&~r),8&t&&(i=0),4&t&&(i=65535&~i);let o=2&t?r+i&65535:r&i;1&t&&(o=65535&~o),1&e&&(s.m=o),2&e&&(s.d=o),4&e&&(s.a=o);const c=32768&o,a=0===o;n&((c?4:0)|(a?2:0)|(c||a?0:1))?s.pc=s.a:s.pc++},emit:()=>`${r[e]}${c[t]}${i[n]}`}}(parseInt(t.substr(3,7),2),parseInt(t.substr(10,3),2),parseInt(t.substr(13,3),2))}class l{constructor(){this._pc=0,this.a=0,this.d=0,this.ram=Array.from({length:32768}).fill(0)}get m(){return s(this.a<=32767,"Accessed memory OOB, a="+this.a),this.ram[this.a]}set m(t){s(this.a<=32767,"Accessed memory OOB, a="+this.a),this.ram[this.a]=t}get pc(){return this._pc}set pc(t){s(t<32767,"PC out of bounds, tried to set "+t),this._pc=t}}class u{constructor(t){this._ticks=0,this.cpu=new l,this.histogram=Array.from({length:32768}).fill(0);const e=t.slice();for(;e.length<32768;)e.push(a("0000000000000000"));this.rom=e}get ram(){return this.cpu.ram}get ticks(){return this._ticks}step(){this._ticks++,this.histogram[this.cpu.pc]++,this.rom[this.cpu.pc].eval(this.cpu)}toString(){return`Machine { a = ${this.cpu.a}, d = ${this.cpu.d}, m = ${this.cpu.m}, pc = ${this.cpu.pc}}`}}console.log("Inspect the window.machine global after loading a hack file.");const p=t=>document.querySelector(t);function d(t){let e="";return 32768&t&&(t=1+(32767&~t),e="-"),e+t.toString()}const m=p("#load-hack"),f=p("#action-step"),h=p("#action-step-x"),v=p("#input-step-x"),g=p("#d-value"),w=p("#a-value"),D=p("#m-value"),b=p("#pc-value"),M=p("#input-step-rate"),y=p("#playing-label");y.textContent="▶";const A=p("canvas"),$=A.getContext("2d");let x;function E(){clearTimeout(x),x=void 0,M.disabled=f.disabled=h.disabled=v.disabled=!1,y.textContent="▶"}p("#action-reset").addEventListener("click",()=>{E(),z(window.fileText)},{passive:!0}),p("#action-step-rate").addEventListener("click",()=>{x?E():function(){M.disabled=f.disabled=h.disabled=v.disabled=!0,y.textContent="❙❙";const t=+M.value/1e3;x=setTimeout((function e(){S(1),x=setTimeout(e,t)}),t)}()},{passive:!0}),f.addEventListener("click",()=>S(1),{passive:!0}),h.addEventListener("click",()=>S(+v.value),{passive:!0});const T=new Clusterize({rows:[],scrollElem:p("#rom .clusterize-scroll"),contentElem:p("#rom .clusterize-content")}),k=new Clusterize({rows:[],scrollElem:p("#ram .clusterize-scroll"),contentElem:p("#ram .clusterize-content")}),C=new Clusterize({rows:[],scrollElem:p("#stack .clusterize-scroll"),contentElem:p("#stack .clusterize-content")});function z(t){var e;try{!function(t){E(),window.machine=new u(t),S(0),$&&($.fillStyle="white",$.fillRect(0,0,A.width,A.height))}(null!==(e=null==t?void 0:t.split("\n").map(t=>t.trim()).filter(Boolean).map(a))&&void 0!==e?e:[])}catch(t){alert(t.message)}}function S(t){const e=window.machine;if(e){try{for(let n=0;n<t;n++)if(e.step(),e.cpu.a>=16384&&$){const t=Math.floor((e.cpu.a-16384)/32),n=e.cpu.a-16384-32*t,s=e.cpu.m;for(let e=0;e<16;e++)$.fillStyle=s&1<<e?"black":"white",$.fillRect(n+e,t,1,1)}}catch(t){alert(t.message)}!function(){const t=window.machine;t&&(g.textContent=d(t.cpu.d),w.textContent=d(t.cpu.a),D.textContent=d(t.cpu.m),b.textContent=d(t.cpu.pc))}(),T.update(e.rom.map((t,n)=>n===e.cpu.pc?`<div class="row hl"><strong>${n}</strong><span>${t.emit()}</span></div>`:`<div class="row"><strong>${n}</strong><span>${t.emit()}</span></div>`)),n(p("#rom .clusterize-scroll"),24*e.cpu.pc),k.update(e.ram.map((t,n)=>n===e.cpu.a?`<div class="row hl"><strong>${n}</strong><span>${d(t)}</span></div>`:`<div class="row"><strong>${n}</strong><span>${d(t)}</span></div>`)),n(p("#ram .clusterize-scroll"),24*e.cpu.a),C.update(e.ram.slice(256,e.ram[0]+5).map((t,n)=>n+256===e.ram[0]?`<div class="row hl"><strong>${n+256}</strong><span>${d(t)}</span></div>`:`<div class="row"><strong>${n+256}</strong><span>${d(t)}</span></div>`)),n(p("#stack .clusterize-scroll"),24*(e.ram[0]-256))}function n(t,e){t.scrollTop+t.clientHeight<e?t.scrollTop=e-Math.floor(2*t.clientHeight/3):e<t.scrollTop&&(t.scrollTop=e-Math.floor(1*t.clientHeight/3))}}m.addEventListener("change",()=>{m.files&&m.files[0]&&function(t){const e=new FileReader;e.addEventListener("load",()=>{window.fileText=e.result,z(window.fileText)},{passive:!0}),e.readAsText(t)}(m.files[0])},{passive:!0})}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./src/cpu.ts":
+/*!********************!*\
+  !*** ./src/cpu.ts ***!
+  \********************/
+/*! exports provided: CPU */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CPU\", function() { return CPU; });\n/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ \"./src/util.ts\");\n\r\nclass CPU {\r\n    constructor() {\r\n        this._pc = 0;\r\n        this.a = 0;\r\n        this.d = 0;\r\n        // Technically doesn't belong here, but this is convenient.\r\n        this.ram = Array.from({ length: 2 ** 15 }).fill(0);\r\n    }\r\n    get m() {\r\n        Object(_util__WEBPACK_IMPORTED_MODULE_0__[\"assert\"])(this.a <= 0x7fff, 'Accessed memory OOB, a=' + this.a);\r\n        return this.ram[this.a];\r\n    }\r\n    set m(value) {\r\n        Object(_util__WEBPACK_IMPORTED_MODULE_0__[\"assert\"])(this.a <= 0x7fff, 'Accessed memory OOB, a=' + this.a);\r\n        this.ram[this.a] = value;\r\n    }\r\n    get pc() {\r\n        return this._pc;\r\n    }\r\n    set pc(value) {\r\n        Object(_util__WEBPACK_IMPORTED_MODULE_0__[\"assert\"])(value < 0x7fff, 'PC out of bounds, tried to set ' + value);\r\n        this._pc = value;\r\n    }\r\n}\r\n\n\n//# sourceURL=webpack:///./src/cpu.ts?");
+
+/***/ }),
+
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _instruction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./instruction */ \"./src/instruction.ts\");\n/* harmony import */ var _machine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./machine */ \"./src/machine.ts\");\n\r\n\r\nconsole.log('Inspect the window.machine global after loading a hack file.');\r\nconst $ = (sel) => document.querySelector(sel);\r\nconst SCREEN = 16384;\r\nconst PAUSE = '❙❙';\r\nconst PLAY = '▶';\r\n// Needed because 0xffff = -1, not 65k. We are dealing with signed 16 bit ints here\r\nfunction toDecimal(num) {\r\n    let sign = '';\r\n    if (num & 0x8000) {\r\n        // negative\r\n        num = ((~num) & 0x7FFF) + 1;\r\n        sign = '-';\r\n    }\r\n    return sign + num.toString();\r\n}\r\nconst fileUpload = $('#load-hack');\r\nconst actionStep = $('#action-step');\r\nconst actionStepX = $('#action-step-x');\r\nconst inputStepX = $('#input-step-x');\r\nconst dValue = $('#d-value');\r\nconst aValue = $('#a-value');\r\nconst mValue = $('#m-value');\r\nconst pcValue = $('#pc-value');\r\nconst inputStepRate = $('#input-step-rate');\r\nconst playingLabel = $('#playing-label');\r\nplayingLabel.textContent = PLAY;\r\nconst canvas = $('canvas');\r\nconst context = canvas.getContext('2d');\r\n$('#action-reset').addEventListener('click', () => {\r\n    cancelRun();\r\n    load(window.fileText);\r\n}, { passive: true });\r\nlet runTimer;\r\n$('#action-step-rate').addEventListener('click', () => {\r\n    if (runTimer) {\r\n        cancelRun();\r\n    }\r\n    else {\r\n        startRun();\r\n    }\r\n}, { passive: true });\r\nfunction cancelRun() {\r\n    clearTimeout(runTimer);\r\n    runTimer = undefined;\r\n    inputStepRate.disabled = actionStep.disabled = actionStepX.disabled = inputStepX.disabled = false;\r\n    playingLabel.textContent = PLAY;\r\n}\r\nfunction startRun() {\r\n    inputStepRate.disabled = actionStep.disabled = actionStepX.disabled = inputStepX.disabled = true;\r\n    playingLabel.textContent = PAUSE;\r\n    const interval = +inputStepRate.value / 1000;\r\n    runTimer = setTimeout(function run() {\r\n        step(1);\r\n        runTimer = setTimeout(run, interval);\r\n    }, interval);\r\n}\r\nactionStep.addEventListener('click', () => step(1), { passive: true });\r\nactionStepX.addEventListener('click', () => step(+inputStepX.value), { passive: true });\r\nconst clusterRom = new Clusterize({\r\n    rows: [],\r\n    scrollElem: $('#rom .clusterize-scroll'),\r\n    contentElem: $('#rom .clusterize-content')\r\n});\r\nconst clusterRam = new Clusterize({\r\n    rows: [],\r\n    scrollElem: $('#ram .clusterize-scroll'),\r\n    contentElem: $('#ram .clusterize-content')\r\n});\r\nconst clusterStack = new Clusterize({\r\n    rows: [],\r\n    scrollElem: $('#stack .clusterize-scroll'),\r\n    contentElem: $('#stack .clusterize-content'),\r\n});\r\nfileUpload.addEventListener('change', () => {\r\n    if (fileUpload.files && fileUpload.files[0]) {\r\n        loadFile(fileUpload.files[0]);\r\n    }\r\n}, { passive: true });\r\nfunction loadFile(file) {\r\n    const reader = new FileReader();\r\n    reader.addEventListener('load', () => {\r\n        window.fileText = reader.result;\r\n        load(window.fileText);\r\n    }, { passive: true });\r\n    reader.readAsText(file);\r\n}\r\nfunction load(text) {\r\n    var _a;\r\n    try {\r\n        const instructions = (_a = text === null || text === void 0 ? void 0 : text.split('\\n').map(l => l.trim()).filter(Boolean).map(_instruction__WEBPACK_IMPORTED_MODULE_0__[\"parse\"])) !== null && _a !== void 0 ? _a : [];\r\n        setupEmulator(instructions);\r\n    }\r\n    catch (error) {\r\n        alert(error.message);\r\n    }\r\n}\r\nfunction setupEmulator(instructions) {\r\n    cancelRun();\r\n    window.machine = new _machine__WEBPACK_IMPORTED_MODULE_1__[\"Machine\"](instructions);\r\n    step(0);\r\n    if (context) {\r\n        context.fillStyle = 'white';\r\n        context.fillRect(0, 0, canvas.width, canvas.height);\r\n    }\r\n}\r\nfunction updateReg() {\r\n    const machine = window.machine;\r\n    if (!machine)\r\n        return;\r\n    dValue.textContent = toDecimal(machine.cpu.d);\r\n    aValue.textContent = toDecimal(machine.cpu.a);\r\n    mValue.textContent = machine.cpu.a <= 0x7fff ? toDecimal(machine.cpu.m) : 'Out of bounds';\r\n    pcValue.textContent = toDecimal(machine.cpu.pc);\r\n}\r\nfunction step(n) {\r\n    const m = window.machine;\r\n    if (!m)\r\n        return;\r\n    try {\r\n        for (let i = 0; i < n; i++) {\r\n            m.step();\r\n            if (m.cpu.a >= SCREEN && m.cpu.a < 0x7fff && context) {\r\n                const y = Math.floor((m.cpu.a - SCREEN) / 32);\r\n                const xStart = ((m.cpu.a) - SCREEN - y * 32);\r\n                const mem = m.cpu.m;\r\n                for (let i = 0; i < 16; i++) {\r\n                    context.fillStyle = mem & (1 << i) ? 'black' : 'white';\r\n                    context.fillRect(xStart + i, y, 1, 1);\r\n                }\r\n            }\r\n        }\r\n    }\r\n    catch (err) {\r\n        alert(err.message);\r\n    }\r\n    function ensureVisible(el, pos) {\r\n        if (el.scrollTop + el.clientHeight < pos) {\r\n            el.scrollTop = pos - Math.floor(el.clientHeight * 2 / 3);\r\n        }\r\n        else if (pos < el.scrollTop) {\r\n            el.scrollTop = pos - Math.floor(el.clientHeight * 1 / 3);\r\n        }\r\n    }\r\n    updateReg();\r\n    clusterRom.update(m.rom.map((inst, i) => {\r\n        if (i === m.cpu.pc) {\r\n            return `<div class=\"row hl\"><strong>${i}</strong><span>${inst.emit()}</span></div>`;\r\n        }\r\n        return `<div class=\"row\"><strong>${i}</strong><span>${inst.emit()}</span></div>`;\r\n    }));\r\n    ensureVisible($('#rom .clusterize-scroll'), 24 * m.cpu.pc);\r\n    clusterRam.update(m.ram.map((ram, i) => {\r\n        if (i === m.cpu.a) {\r\n            return `<div class=\"row hl\"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`;\r\n        }\r\n        return `<div class=\"row\"><strong>${i}</strong><span>${toDecimal(ram)}</span></div>`;\r\n    }));\r\n    ensureVisible($('#ram .clusterize-scroll'), 24 * m.cpu.a);\r\n    clusterStack.update(m.ram.slice(256, m.ram[0] + 5).map((ram, i) => {\r\n        if (i + 256 === m.ram[0]) {\r\n            return `<div class=\"row hl\"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`;\r\n        }\r\n        return `<div class=\"row\"><strong>${i + 256}</strong><span>${toDecimal(ram)}</span></div>`;\r\n    }));\r\n    ensureVisible($('#stack .clusterize-scroll'), 24 * (m.ram[0] - 256));\r\n}\r\n\n\n//# sourceURL=webpack:///./src/index.ts?");
+
+/***/ }),
+
+/***/ "./src/instruction.ts":
+/*!****************************!*\
+  !*** ./src/instruction.ts ***!
+  \****************************/
+/*! exports provided: parse */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"parse\", function() { return parse; });\n/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ \"./src/util.ts\");\n\r\nfunction makeA(value) {\r\n    return {\r\n        type: 'a',\r\n        eval: cpu => {\r\n            cpu.a = value;\r\n            cpu.pc++;\r\n        },\r\n        emit: () => `@${value}`\r\n    };\r\n}\r\nconst DEST_MAP = [\r\n    '',\r\n    'M=',\r\n    'D=',\r\n    'MD=',\r\n    'A=',\r\n    'AM=',\r\n    'AD=',\r\n    'AMD='\r\n];\r\nconst JUMP_MAP = [\r\n    '',\r\n    ';JGT',\r\n    ';JEQ',\r\n    ';JGE',\r\n    ';JLT',\r\n    ';JNE',\r\n    ';JLE',\r\n    ';JMP'\r\n];\r\n// Only a few instructions are standard. Non standard instructions are mapped\r\n// either to a custom mnemonic (chosen for simplicity) or to X instructions.\r\nconst X = Symbol();\r\nconst COMP_MAP = [\r\n    'D&A',\r\n    '!(D&A)',\r\n    'D+A',\r\n    X,\r\n    'D&!A',\r\n    '!(D&!A)',\r\n    X,\r\n    'A-D',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    'D',\r\n    '!D',\r\n    'D-1',\r\n    '~D',\r\n    '!D&A',\r\n    'D|!A',\r\n    X,\r\n    'D-A',\r\n    '!D&!A',\r\n    'D|A',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    'D+1',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    '0',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    'A',\r\n    '!A',\r\n    'A-1',\r\n    '~A',\r\n    X,\r\n    X,\r\n    X,\r\n    'A+1',\r\n    X,\r\n    X,\r\n    '-1',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    '1',\r\n    'D&M',\r\n    '!(D&M)',\r\n    'D+M',\r\n    X,\r\n    'D&!M',\r\n    '!D|M',\r\n    X,\r\n    'M-D',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    '!D&M',\r\n    'D|!M',\r\n    X,\r\n    'D-M',\r\n    '!D&!M',\r\n    'D|M',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    'M',\r\n    '!M',\r\n    'M-1',\r\n    '~M',\r\n    X,\r\n    X,\r\n    X,\r\n    'M+1',\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n    X,\r\n].map((v, i) => v === X ? `X${i.toString(16).toUpperCase()}` : v);\r\nfunction makeC(comp, dest, jump) {\r\n    return {\r\n        type: 'c',\r\n        eval: cpu => {\r\n            let x = cpu.d;\r\n            let y = comp & 0b1000000 ? cpu.m : cpu.a;\r\n            if (comp & 0b0100000) {\r\n                x = 0;\r\n            }\r\n            if (comp & 0b0010000) {\r\n                x = (~x) & 0xFFFF;\r\n            }\r\n            if (comp & 0b0001000) {\r\n                y = 0;\r\n            }\r\n            if (comp & 0b0000100) {\r\n                y = (~y) & 0xFFFF;\r\n            }\r\n            let out = comp & 0b0000010 ? (x + y) & 0xFFFF : x & y;\r\n            if (comp & 0b0000001) {\r\n                out = (~out) & 0xFFFF;\r\n            }\r\n            // Order matters - m before a.\r\n            if (dest & 0b001) {\r\n                cpu.m = out;\r\n            }\r\n            if (dest & 0b010) {\r\n                cpu.d = out;\r\n            }\r\n            if (dest & 0b100) {\r\n                cpu.a = out;\r\n            }\r\n            const neg = out & 0x8000;\r\n            const zero = out === 0;\r\n            // LT EQ GT\r\n            const cmp = (neg ? 0b100 : 0)\r\n                | (zero ? 0b010 : 0)\r\n                | (!neg && !zero ? 0b001 : 0);\r\n            if (jump & cmp) {\r\n                cpu.pc = cpu.a;\r\n            }\r\n            else {\r\n                cpu.pc++;\r\n            }\r\n        },\r\n        emit: () => `${DEST_MAP[dest]}${COMP_MAP[comp]}${JUMP_MAP[jump]}`\r\n    };\r\n}\r\nfunction parse(instruction) {\r\n    Object(_util__WEBPACK_IMPORTED_MODULE_0__[\"assert\"])(/^[01]{16}$/.test(instruction), `Instruction '${instruction}' does not match format.`);\r\n    if (instruction[0] === '0') {\r\n        return makeA(parseInt(instruction, 2));\r\n    }\r\n    const comp = parseInt(instruction.substr(3, 7), 2);\r\n    const dest = parseInt(instruction.substr(10, 3), 2);\r\n    const jump = parseInt(instruction.substr(13, 3), 2);\r\n    return makeC(comp, dest, jump);\r\n}\r\n\n\n//# sourceURL=webpack:///./src/instruction.ts?");
+
+/***/ }),
+
+/***/ "./src/machine.ts":
+/*!************************!*\
+  !*** ./src/machine.ts ***!
+  \************************/
+/*! exports provided: Machine */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Machine\", function() { return Machine; });\n/* harmony import */ var _cpu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cpu */ \"./src/cpu.ts\");\n/* harmony import */ var _instruction__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instruction */ \"./src/instruction.ts\");\n\r\n\r\nclass Machine {\r\n    constructor(instructions) {\r\n        this._ticks = 0;\r\n        this.cpu = new _cpu__WEBPACK_IMPORTED_MODULE_0__[\"CPU\"]();\r\n        this.histogram = Array.from({ length: 2 ** 15 }).fill(0);\r\n        const rom = instructions.slice();\r\n        while (rom.length < 2 ** 15) {\r\n            rom.push(Object(_instruction__WEBPACK_IMPORTED_MODULE_1__[\"parse\"])('0000000000000000'));\r\n        }\r\n        this.rom = rom;\r\n    }\r\n    get ram() {\r\n        return this.cpu.ram;\r\n    }\r\n    get ticks() {\r\n        return this._ticks;\r\n    }\r\n    step() {\r\n        this._ticks++;\r\n        this.histogram[this.cpu.pc]++;\r\n        this.rom[this.cpu.pc].eval(this.cpu);\r\n    }\r\n    toString() {\r\n        return `Machine { a = ${this.cpu.a}, d = ${this.cpu.d}, m = ${this.cpu.m}, pc = ${this.cpu.pc}}`;\r\n    }\r\n}\r\n\n\n//# sourceURL=webpack:///./src/machine.ts?");
+
+/***/ }),
+
+/***/ "./src/util.ts":
+/*!*********************!*\
+  !*** ./src/util.ts ***!
+  \*********************/
+/*! exports provided: assert */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"assert\", function() { return assert; });\nfunction assert(arg, message = 'Failed assert') {\r\n    if (!arg) {\r\n        throw new Error(message);\r\n    }\r\n}\r\n\n\n//# sourceURL=webpack:///./src/util.ts?");
+
+/***/ })
+
+/******/ });

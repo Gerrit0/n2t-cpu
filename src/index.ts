@@ -128,7 +128,7 @@ function updateReg() {
 
     dValue.textContent = toDecimal(machine.cpu.d)
     aValue.textContent = toDecimal(machine.cpu.a)
-    mValue.textContent = toDecimal(machine.cpu.m)
+    mValue.textContent = machine.cpu.a <= 0x7fff ? toDecimal(machine.cpu.m) : 'Out of bounds'
     pcValue.textContent = toDecimal(machine.cpu.pc)
 }
 
@@ -139,7 +139,7 @@ function step(n: number) {
     try {
         for (let i = 0; i < n; i++) {
             m.step()
-            if (m.cpu.a >= SCREEN && context) {
+            if (m.cpu.a >= SCREEN && m.cpu.a < 0x7fff && context) {
                 const y = Math.floor((m.cpu.a - SCREEN) / 32)
                 const xStart = ((m.cpu.a) - SCREEN - y * 32)
                 const mem = m.cpu.m;
