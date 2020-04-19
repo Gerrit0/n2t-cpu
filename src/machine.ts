@@ -1,5 +1,6 @@
 import { CPU } from "./cpu";
 import { Instruction, parse } from "./instruction";
+export { RAM_SIZE } from "./cpu";
 
 export class Machine {
     private _ticks = 0

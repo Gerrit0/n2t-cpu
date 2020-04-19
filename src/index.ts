@@ -1,5 +1,5 @@
 import { parse, Instruction } from "./instruction"
-import { Machine } from "./machine"
+import { Machine, RAM_SIZE } from "./machine"
 import { ensureVisible } from "./gui"
 
 console.log('Inspect the window.machine global after loading a hack file.')
@@ -22,6 +22,7 @@ function toDecimal(num: number) {
 }
 
 const fileUpload = $('#load-hack') as HTMLInputElement
+const ramUpload = $('#load-ram') as HTMLInputElement
 const actionStep = $('#action-step') as HTMLButtonElement
 const actionStepX = $('#action-step-x') as HTMLButtonElement
 const inputStepX = $('#input-step-x') as HTMLInputElement
@@ -162,7 +163,7 @@ const clusterStack = new Clusterize({
     contentElem: $('#stack .clusterize-content'),
 })
 
-fileUpload.addEventListener('change', () => {
+fileUpload.addEventListener('input', () => {
     if (fileUpload.files && fileUpload.files[0]) {
         loadFile(fileUpload.files[0])
     }
@@ -171,6 +172,45 @@ Mousetrap.bind('mod+o', event => {
     event.preventDefault()
     fileUpload.click()
 })
+
+ramUpload.addEventListener('input', () => {
+    if (ramUpload.files && ramUpload.files[0]) {
+        loadRam(ramUpload.files[0])
+    }
+}, { passive: true })
+Mousetrap.bind('mod+shift+o', event => {
+    event.preventDefault()
+    ramUpload.click()
+})
+
+function loadRam(file: File) {
+    const reader = new FileReader()
+
+    reader.addEventListener('load', () => {
+        if (!window.machine) {
+            alert("Can't load RAM without a machine. Load hack file first.")
+            return;
+        }
+
+        const text = reader.result as string
+        for (const line of text.split(/\r?\n/)) {
+            const match = line.match(/^RAM\[(\d{1,5})\]: (\d+)$/)
+            if (match) {
+                const address = parseInt(match[1], 10)
+                let value = parseInt(match[2], 10)
+                if (value < 0) {
+                    value = -value & 0xFFFF
+                    value |= 0x8000
+                }
+                window.machine.ram[address] = value & 0xFFFF
+            }
+        }
+        refreshGui(window.machine)
+        refreshScreen()
+    }, { passive: true })
+
+    reader.readAsText(file)
+}
 
 function loadFile(file: File) {
     const reader = new FileReader()
@@ -258,13 +298,27 @@ function refreshGui(m: Machine) {
     ensureVisible(clusterStack.scroll_elem, 24 * (m.ram[0] - 256))
 }
 
+function refreshScreen(m = window.machine) {
+    if (!context || !m) return
+
+    for (let i = SCREEN; i < RAM_SIZE - 1; i++) {
+        const y = Math.floor((i - SCREEN) / 32)
+        const xStart = (i - SCREEN - y * 32) * 16
+        const mem = m.ram[i]
+        for (let j = 0; j < 16; j++) {
+            context.fillStyle = mem & (1 << j) ? 'black' : 'white'
+            context.fillRect(xStart + j, y, 1, 1)
+        }
+    }
+}
+
 function updateReg() {
     const machine = window.machine
     if (!machine) return
 
     dValue.textContent = toDecimal(machine.cpu.d)
     aValue.textContent = toDecimal(machine.cpu.a)
-    mValue.textContent = machine.cpu.a <= 0x7fff ? toDecimal(machine.cpu.m) : 'Out of bounds'
+    mValue.textContent = machine.cpu.a < RAM_SIZE ? toDecimal(machine.cpu.m) : 'Out of bounds'
     pcValue.textContent = toDecimal(machine.cpu.pc)
 }
 
@@ -275,15 +329,6 @@ function step(n: number) {
     try {
         for (let i = 0; i < n; i++) {
             m.step()
-            if (m.cpu.a >= SCREEN && m.cpu.a < 0x7fff && context) {
-                const y = Math.floor((m.cpu.a - SCREEN) / 32)
-                const xStart = ((m.cpu.a) - SCREEN - y * 32)
-                const mem = m.cpu.m;
-                for (let i = 0; i < 16; i++) {
-                    context.fillStyle = mem & (1 << i) ? 'black' : 'white'
-                    context.fillRect(xStart + i, y, 1, 1)
-                }
-            }
             if (breakpoints.has(m.cpu.pc)) {
                 break
             }
@@ -292,5 +337,6 @@ function step(n: number) {
         alert(err.message)
     } finally {
         refreshGui(m)
+        refreshScreen(m)
     }
 }

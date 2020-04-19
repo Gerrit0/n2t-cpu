@@ -1,12 +1,14 @@
 import { assert } from "./util"
 
+export const RAM_SIZE = 2 ** 15
+
 export class CPU {
     private _pc = 0
 
     a = 0
     d = 0
     // Technically doesn't belong here, but this is convenient.
-    ram = Array.from<number>({ length: 2 ** 15 }).fill(0)
+    ram = Array.from<number>({ length: RAM_SIZE }).fill(0)
 
     get m() {
         assert(this.a <= 0x7fff, 'Accessed memory OOB, a=' + this.a)
@@ -27,4 +29,3 @@ export class CPU {
         this._pc = value
     }
 }
-

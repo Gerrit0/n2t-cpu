@@ -13,6 +13,8 @@ Supports drawing to the screen, but not keyboard input.
 
     | Shortcut | Behavior |
     | --- | --- |
+    | `ctrl+o` | Open a hack file |
+    | `ctrl+shift+o` | Open a RAM dump file |
     | `s` | Step 1 |
     | `x` | Step X |
     | `shift+x` | Step X (prompt for X) |
