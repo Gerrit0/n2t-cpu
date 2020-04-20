@@ -197,17 +197,7 @@ function makeC(comp: number, dest: number, jump: number): Instruction {
                 out = (~out) & 0xFFFF
             }
 
-            // Order matters - m before a.
-            if (dest & 0b001) {
-                cpu.m = out
-            }
-            if (dest & 0b010) {
-                cpu.d = out
-            }
-            if (dest & 0b100) {
-                cpu.a = out
-            }
-
+            // This must be done before setting new register values.
             const neg = out & 0x8000
             const zero = out === 0
             // LT EQ GT
@@ -219,6 +209,17 @@ function makeC(comp: number, dest: number, jump: number): Instruction {
                 cpu.pc = cpu.a
             } else {
                 cpu.pc++
+            }
+
+            // Order matters - m before a.
+            if (dest & 0b001) {
+                cpu.m = out
+            }
+            if (dest & 0b010) {
+                cpu.d = out
+            }
+            if (dest & 0b100) {
+                cpu.a = out
             }
         },
         emit: () => `${DEST_MAP[dest]}${COMP_MAP[comp]}${JUMP_MAP[jump]}`
